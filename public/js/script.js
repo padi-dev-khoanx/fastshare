@@ -50,6 +50,7 @@ function startUpload() {
 function showDone() {
 	$button.html('Xong');
 }
+
 var SITEURL = window.location.href;
 $(function() {
     $(document).ready(function()
@@ -68,8 +69,8 @@ $(function() {
                 percent.html(percentVal);
             },
             complete: function(xhr) {
-                alert('File Has Been Uploaded Successfully');
-                window.location.href = SITEURL ;
+                alert('Link download: ' + SITEURL + 'upload/' + fileName);
+                window.location.href = SITEURL;
             }
           });
     });

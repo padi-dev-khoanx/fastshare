@@ -9,9 +9,26 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js"></script>
     <style>
-        .progress { position:relative; width:100%; }
-        .bar { background-color: #00ff00; width:0%; height:20px; }
-        .percent { position:absolute; display:inline-block; left:50%; color: #040608;}
+        .progress {
+            position:relative;
+            width:100%;
+            height: 20px;
+        }
+        .bar {
+            background-color: #498C25;
+            width:0%;
+            height:20px;
+        }
+        .percent {
+            position:absolute;
+            display:inline-block;
+            margin: auto;
+            text-align: center;
+            color: #fff;
+            z-index: 99;
+            width: 100%;
+            height: 20px;
+        }
    </style>
 </head>
 <body>
@@ -40,9 +57,90 @@
     </form>
 </div>
 <!-- partial -->
-<script src="{{asset('/js/script.js')}}">
-<script type="text/javascript">
 
+<script type="text/javascript">
+    var droppedFiles = false;
+    var fileName = '';
+    var $dropzone = $('.dropzone');
+    var $button = $('.upload-btn');
+    var uploading = false;
+    var $syncing = $('.syncing');
+    var $done = $('.done');
+    var $bar = $('.bar');
+    var timeOut;
+
+    $dropzone.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    })
+        .on('dragover dragenter', function() {
+        $dropzone.addClass('is-dragover');
+    })
+        .on('dragleave dragend drop', function() {
+        $dropzone.removeClass('is-dragover');
+    })
+        .on('drop', function(e) {
+        droppedFiles = e.originalEvent.dataTransfer.files;
+        fileName = droppedFiles[0]['name'];
+        $('.filename').html(fileName);
+        $('.dropzone .upload').hide();
+    });
+
+    $button.bind('click', function() {
+        startUpload();
+    });
+
+    $("input:file").change(function (){
+        fileName = $(this)[0].files[0].name;
+        $('.filename').html(fileName);
+        $('.dropzone .upload').hide();
+    });
+
+    function startUpload() {
+        if (!uploading && fileName != '' ) {
+            uploading = true;
+            $button.html('Đang tải lên...');
+            $dropzone.fadeOut();
+            $syncing.addClass('active');
+            $done.addClass('active');
+            $bar.addClass('active');
+            // timeoutID = window.setTimeout(showDone, 3200);
+        }
+    }
+
+    // function showDone() {
+    //     $button.html('Xong');
+    // }
+
+    var SITEURL = window.location.href;
+    $(function() {
+        $(document).ready(function()
+        {
+            var bar = $('.bar');
+            var percent = $('.percent');
+            $('form').ajaxForm({
+                beforeSend: function() {
+                    var percentVal = '0%';
+                    bar.width(percentVal)
+                    percent.html(percentVal);
+                },
+                uploadProgress: function(event, position, total, percentComplete) {
+                    var percentVal = percentComplete + '%';
+                    bar.width(percentVal)
+                    percent.html(percentVal);
+                },
+                complete: function(xhr) {
+                    // alert('Link download: ' + SITEURL + 'upload/' + fileName);
+                    // window.location.href = SITEURL;
+                    $button.html('Xong');
+                    value = 'ahihi'
+                    $temp.val(value).select();
+                    document.execCommand("copy");
+                }
+            });
+        });
+    });
 </script>
+
 </body>
 </html>

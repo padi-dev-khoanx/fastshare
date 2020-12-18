@@ -30,7 +30,7 @@ class HomeController extends Controller
         $data['path'] = $path;
         $data['type'] = $type;
         File::create($data);
-        return redirect('/')->with('status', 'Tải file thành công');
+        return redirect('/');
     }
 
     /**
