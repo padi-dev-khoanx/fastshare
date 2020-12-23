@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\File;
+use App\Models\FileUpload;
 use Carbon\Carbon;
-
+use Facade\FlareClient\Http\Response;
+use Illuminate\Support\Facades\File;
 class HomeController extends Controller
 {
     /**
@@ -29,10 +30,21 @@ class HomeController extends Controller
         $data['name'] = $name;
         $data['path'] = $path;
         $data['type'] = $type;
-        File::create($data);
+        FileUpload::create($data);
         return redirect('/');
     }
-
+    public function download($path)
+    {
+        $pathToFile = 'upload/'.$path;
+        $isExists = File::exists($pathToFile);
+        return view('download', compact('path', 'isExists'));
+    }
+    public function downloadFile(Request $request)
+    {
+        $pathToFile = 'upload/'.$request->filePath;
+        $name = $request->filePath;
+        return response()->download($pathToFile, $name)->deleteFileAfterSend(true);
+    }
     /**
      * Show the form for creating a new resource.
      *

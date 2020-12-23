@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class FileUpload extends Model
 {
     protected $guarded = [];
     protected $table = 'files';

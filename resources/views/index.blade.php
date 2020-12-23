@@ -118,18 +118,16 @@
                     $dropzone.fadeOut();
                 },
                 complete: function(xhr) {
-                    // alert('Link download: ' + SITEURL + 'upload/' + fileName);
-                    // window.location.href = SITEURL;
                     window.onbeforeunload = function () {}
-                    $button.html('Xong');
+                    $button.html('Xong').attr('for','');
                     $syncing.removeClass('active');
                     $done.addClass('active');
                     setTimeout(function(){
                         $upload_content.fadeOut();
                         $show_link.fadeIn(1500);
                     }, 2000);
-                    $('.link-input').val(SITEURL + 'upload/' + fileName);
-                    $('#link-value').html(SITEURL + 'upload/' + fileName);
+                    $('.link-input').val(SITEURL + fileName);
+                    $('#link-value').html(SITEURL + fileName);
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     alert(xhr.status);

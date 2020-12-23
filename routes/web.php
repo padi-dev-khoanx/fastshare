@@ -15,3 +15,5 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::post('/upload_file', [HomeController::class, 'upload'])->name('home.upload');
+Route::get('/{path}', [HomeController::class, 'download']);
+Route::post('/download', [HomeController::class, 'downloadFile']);
