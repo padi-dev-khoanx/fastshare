@@ -18,6 +18,8 @@ class CreateTableFilesTable extends Migration
             $table->text('name');
             $table->text('path');
             $table->text('type');
+            $table->text('path_download');
+            $table->integer('size');
             $table->timestamps();
         });
     }

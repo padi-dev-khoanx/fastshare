@@ -7,6 +7,8 @@ use App\Models\FileUpload;
 use Carbon\Carbon;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+
 class HomeController extends Controller
 {
     /**
@@ -21,28 +23,36 @@ class HomeController extends Controller
 
     public function upload(Request $request)
     {
-        // $validatedData = $request->validate([
-        //     'file' => 'required|max:2048',
-        // ]);
-        $name = $request->file('file_share')->getClientOriginalName();
-        $type = $request->file('file_share')->getClientOriginalExtension();;
-        $path = $request->file('file_share')->move('upload', $name);
-        $data['name'] = $name;
-        $data['path'] = $path;
-        $data['type'] = $type;
-        FileUpload::create($data);
-        return redirect('/');
+        
+
+        $data['name'] = $request->file('file_share')->getClientOriginalName();
+        $data['type'] = $request->file('file_share')->getClientOriginalExtension();
+        $data['size'] = $request->file('file_share')->getSize();
+        $data['path'] = $request->file('file_share')->move('upload', $data['name']);
+        $data['path_download'] = '';
+
+        $dataCreated = FileUpload::create($data);
+        $path_download = trim(base64_encode(str_pad($dataCreated->id, 6, '.')), '=');
+        
+        $data['path_download'] = $path_download;
+        $query = FileUpload::find($dataCreated->id);
+        $query['path_download'] = $path_download;
+        $query->save();
+
+        return response()->json(['path_download'=> $path_download]);
     }
     public function download($path)
     {
-        $pathToFile = 'upload/'.$path;
-        $isExists = File::exists($pathToFile);
-        return view('download', compact('path', 'isExists'));
+        $idFile = trim(base64_decode($path), '.');
+        $file = (FileUpload::find($idFile));
+        $isExists = File::exists($file->path);
+        return view('download', compact('file', 'isExists'));
     }
     public function downloadFile(Request $request)
     {
-        $pathToFile = 'upload/'.$request->filePath;
-        $name = $request->filePath;
+        $pathToFile = 'upload/' . substr($request->filePath,7);
+        $name = substr($request->filePath,7);
+
         return response()->download($pathToFile, $name)->deleteFileAfterSend(true);
     }
     /**
