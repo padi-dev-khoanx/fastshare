@@ -20,8 +20,9 @@
                     @csrf
                     <div class="dropzone">
                         <div class="content">
-                            <span class="filename">{{$file->name}}</span>
+                            <span class="filename" name="fileName">{{$file->name}}</span>
                             <input name="filePath" value="{{$file->path}}" hidden>
+                            <input name="fileName" value="{{$file->name}}" hidden>
                         </div>
                     </div>
                     <label class="upload-btn" for="submit">

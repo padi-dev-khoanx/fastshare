@@ -23,17 +23,16 @@ class HomeController extends Controller
 
     public function upload(Request $request)
     {
-        
-
+        $now = strtotime(Carbon::now());
         $data['name'] = $request->file('file_share')->getClientOriginalName();
         $data['type'] = $request->file('file_share')->getClientOriginalExtension();
         $data['size'] = $request->file('file_share')->getSize();
-        $data['path'] = $request->file('file_share')->move('upload', $data['name']);
+        $data['path'] = $request->file('file_share')->move('upload', $data['name'].$now);
         $data['path_download'] = '';
 
         $dataCreated = FileUpload::create($data);
         $path_download = trim(base64_encode(str_pad($dataCreated->id, 6, '.')), '=');
-        
+
         $data['path_download'] = $path_download;
         $query = FileUpload::find($dataCreated->id);
         $query['path_download'] = $path_download;
@@ -44,15 +43,14 @@ class HomeController extends Controller
     public function download($path)
     {
         $idFile = trim(base64_decode($path), '.');
-        $file = (FileUpload::find($idFile));
+        $file = FileUpload::find($idFile);
         $isExists = File::exists($file->path);
         return view('download', compact('file', 'isExists'));
     }
     public function downloadFile(Request $request)
     {
         $pathToFile = 'upload/' . substr($request->filePath,7);
-        $name = substr($request->filePath,7);
-
+        $name = $request->fileName;
         return response()->download($pathToFile, $name)->deleteFileAfterSend(true);
     }
     /**
