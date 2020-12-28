@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{asset('/css/dropzone.css')}}">
     <link rel="stylesheet" href="{{asset('/css/style.css')}}">
     {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"> --}}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    {{-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"> --}}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js"></script> --}}
     <script type="text/javascript" src="{{asset('/js/dropzone.js')}}"></script>
@@ -22,9 +22,11 @@
         lên 6 files 1 lúc. File sẽ tự <strong>xoá</strong> sau khi được tải về.)</span>
     </div>
 </div>
+
 </section>
 
 <script type="text/javascript">
+var listId = [];
 Dropzone.options.myDropzone= {
     url: '{{ url('upload_file') }}',
     headers: {
@@ -39,9 +41,8 @@ Dropzone.options.myDropzone= {
     dictCancelUpload: "<div class=\"text-remove\"> Huỷ tải lên </div>",
     dictUploadCanceled: "<div class=\"text-remove\"> Đã huỷ </div>",
     dictCancelUploadConfirmation: "Bạn chắc chắn muốn huỷ tải lên?",
-    dictRemoveFile: "<div class=\"text-remove\"> Xoá </div>",
+    dictRemoveFile: "<div class=\"text-remove\" onclick=\" idFile = this.id ;deleteFunction() \"> Xoá </div>",
     dictMaxFilesExceeded: "Bạn không thể tải thêm file lên nữa.",
-    // acceptedFiles: ".jpeg,.jpg,.png,.gif",
     dictFileTooBig: 'File tải lên phải nhỏ hơn 100MB',
     addRemoveLinks: true,
     removedfile: function(file) {
@@ -64,31 +65,28 @@ Dropzone.options.myDropzone= {
         });
         this.on("successmultiple", function (files, response) {
             window.onbeforeunload = function () {}
-            var idFile = response.id;
-            console.log(response.path_download);
-            $( ".dz-remove" ).after( "<a class=\"dz-remove\"><div class=\"text-remove\"> Xoá </div></a>" );
-
-            this.on("removedfile", function (files, response) {
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ url('delete_file') }}',
-                    headers: {
-                        'X-CSRF-TOKEN': '{!! csrf_token() !!}'
-                    },
-                    data: {
-                        "id": idFile
-                    },
-                    dataType: 'html',
-                    success: function(data) {
-                        $("#msg").html(data);
-                    }
-                });
-            });
+            listId.push(response.id);
+            $(".text-remove").each(function(index, value){
+                $(this).attr('id', listId[index]);
+            })
         });
         this.on("canceledmultiple", function (files, response) {
             window.onbeforeunload = function () {}
         });
     },
+}
+function deleteFunction(){
+    $.ajax({
+        type: 'POST',
+        url: '{{ url('delete_file') }}',
+        headers: {
+            'X-CSRF-TOKEN': '{!! csrf_token() !!}'
+        },
+        data: {
+            "id": idFile
+        },
+        dataType: 'html'
+    });
 }
 </script>
 
