@@ -56,7 +56,6 @@ class HomeController extends Controller
     }
     public function delete(Request $request)
     {
-        Log::info($request->all());
         $file = FileUpload::find($request['id']);
         File::delete($file->path);
         $file->delete();

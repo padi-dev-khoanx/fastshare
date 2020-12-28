@@ -42,7 +42,7 @@ Dropzone.options.myDropzone= {
     dictUploadCanceled: "<div class=\"text-remove\"> Đã huỷ </div>",
     dictCancelUploadConfirmation: "Bạn chắc chắn muốn huỷ tải lên?",
     dictRemoveFile: "<div class=\"text-remove\" onclick=\" idFile = this.id ;deleteFunction() \"> Xoá </div>",
-    dictMaxFilesExceeded: "Bạn không thể tải thêm file lên nữa.",
+    dictMaxFilesExceeded: "Bạn chỉ có thể tải lên 6 file.",
     dictFileTooBig: 'File tải lên phải nhỏ hơn 100MB',
     addRemoveLinks: true,
     removedfile: function(file) {
@@ -69,24 +69,27 @@ Dropzone.options.myDropzone= {
             $(".text-remove").each(function(index, value){
                 $(this).attr('id', listId[index]);
             })
+            console.log(response.id)
         });
         this.on("canceledmultiple", function (files, response) {
             window.onbeforeunload = function () {}
         });
     },
 }
-function deleteFunction(){
-    $.ajax({
-        type: 'POST',
-        url: '{{ url('delete_file') }}',
-        headers: {
-            'X-CSRF-TOKEN': '{!! csrf_token() !!}'
-        },
-        data: {
-            "id": idFile
-        },
-        dataType: 'html'
-    });
+function deleteFunction() {
+    if(idFile.length != 0) {
+        $.ajax({
+            type: 'POST',
+            url: '{{ url('delete_file') }}',
+            headers: {
+                'X-CSRF-TOKEN': '{!! csrf_token() !!}'
+            },
+            data: {
+                "id": idFile
+            },
+            dataType: 'html'
+        });
+    }
 }
 </script>
 
