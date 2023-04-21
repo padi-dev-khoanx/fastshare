@@ -24,21 +24,22 @@ class HomeController extends Controller
     public function upload(Request $request)
     {
         $now = strtotime(Carbon::now());
-        $data['name'] = $request->file('file_share')->getClientOriginalName();
-        $data['type'] = $request->file('file_share')->getClientOriginalExtension();
-        $data['size'] = $request->file('file_share')->getSize();
-        $data['path'] = $request->file('file_share')->move('upload', $data['name'].$now);
-        $data['path_download'] = '';
+        foreach ($request->file('file') as $fileKey => $fileObject ) {
+            $data['name'] = $fileObject->getClientOriginalName();
+            $data['type'] = $fileObject->getClientOriginalExtension();
+            $data['size'] = $fileObject->getSize();
+            $data['path'] = $fileObject->move('upload', $data['name'].$now);
+            $data['path_download'] = '';
+            $dataCreated = FileUpload::create($data);
 
-        $dataCreated = FileUpload::create($data);
-        $path_download = trim(base64_encode(str_pad($dataCreated->id, 6, '.')), '=');
+            $path_download = trim(base64_encode(str_pad($dataCreated->id, 6, '.')), '=');
 
-        $data['path_download'] = $path_download;
-        $query = FileUpload::find($dataCreated->id);
-        $query['path_download'] = $path_download;
-        $query->save();
-
-        return response()->json(['path_download'=> $path_download]);
+            $data['path_download'] = $path_download;
+            $query = FileUpload::find($dataCreated->id);
+            $query['path_download'] = $path_download;
+            $query->save();
+            return response()->json(['path_download'=> $path_download, 'id' => $dataCreated->id]);
+        }
     }
     public function download($path)
     {
@@ -52,6 +53,12 @@ class HomeController extends Controller
         $pathToFile = 'upload/' . substr($request->filePath,7);
         $name = $request->fileName;
         return response()->download($pathToFile, $name)->deleteFileAfterSend(true);
+    }
+    public function delete(Request $request)
+    {
+        $file = FileUpload::find($request['id']);
+        File::delete($file->path);
+        $file->delete();
     }
     /**
      * Show the form for creating a new resource.
